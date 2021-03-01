@@ -1,7 +1,9 @@
-FROM python:3
+FROM chainer/chainer:latest-python3
 
 RUN echo "alias ls='ls --color=auto'" >> /root/.bashrc
 RUN echo "alias ll='ls --color=auto -l'" >> /root/.bashrc
+RUN ln -s /usr/bin/python3.6 /usr/bin/python
+RUN ln -s /usr/bin/pip3 /usr/bin/pip
 
 WORKDIR /workspace
 

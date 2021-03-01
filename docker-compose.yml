@@ -1,4 +1,4 @@
-version: '3'
+version: '2.3'
 
 services:
     chocoball-trainer:
@@ -6,6 +6,10 @@ services:
             context: .
             dockerfile: ./docker/Dockerfile
         image: choco-detector:0.1
+        runtime: nvidia
+        environment:
+            NVIDIA_VISIBLE_DEVICES: all
+            NVIDIA_DRIVER_CAPABILITIES: all
         ports: # 公開用のポート, host:container
             - "8066:8888"
         container_name: train_choco_detector.1
