@@ -7,5 +7,3 @@ jupyter
 jupyterlab
 numpy
 pandas
-matplotlib
-seaborn
