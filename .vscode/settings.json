@@ -2,8 +2,16 @@
     "python.linting.pylintEnabled": false,
     "python.formatting.provider": "black",
     "python.linting.flake8Enabled": true,
+    "python.linting.flake8Args": [
+        "--max-line-length",
+        "89",
+        "--ignore=W503,W504"
+    ],
     "python.linting.lintOnSave": true,
     "editor.formatOnSave": true,
+    "editor.rulers": [
+        89,
+    ],
     "python.pythonPath": "/usr/local/bin/python",
     "editor.codeActionsOnSave": {
         "source.organizeImports": true
