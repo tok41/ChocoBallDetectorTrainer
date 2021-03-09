@@ -17,5 +17,6 @@ RUN apt-get install -y nodejs
 COPY requirements.txt /tmp/
 RUN pip install --upgrade pip
 RUN pip install -r /tmp/requirements.txt
+ENV PYTHONPATH /workspace:$PYTHONPATH
 
 RUN jupyter serverextension enable --py jupyterlab
