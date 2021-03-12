@@ -1,4 +1,5 @@
-
+*.JPG
+*.xml
 *.pyc
 *.o
 Untitled*
