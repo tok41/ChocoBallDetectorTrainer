@@ -3,6 +3,7 @@
 *.pyc
 *.o
 Untitled*
+tmp_*
 .coverage
 
 .pytest_cache/
