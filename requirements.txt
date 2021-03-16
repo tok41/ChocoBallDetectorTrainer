@@ -12,3 +12,4 @@ seaborn
 configargparse
 PyYAML
 chainercv
+xmltodict
