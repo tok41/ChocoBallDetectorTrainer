@@ -9,3 +9,4 @@ tmp_*
 .pytest_cache/
 .ipynb_checkpoints/
 .cache/
+out/
