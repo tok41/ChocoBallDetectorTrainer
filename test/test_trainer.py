@@ -23,16 +23,6 @@ def sample_preprocess():
 
 
 class TestSetDataset:
-    def test_set_train_data(self, sample_trainer):
-        sample_trainer.set_train_rate(0.5)
-        assert sample_trainer.train_rate == 0.5
-
-    def test_set_train_data_invalid_value(self, sample_trainer):
-        with pytest.raises(ValueError):
-            sample_trainer.set_train_rate(-0.1)
-        with pytest.raises(ValueError):
-            sample_trainer.set_train_rate(1.5)
-
     def test_set_data(self, sample_trainer, sample_preprocess):
         bboxs = sample_preprocess.get_bbox_list()
         imgs = sample_preprocess.get_img_array()

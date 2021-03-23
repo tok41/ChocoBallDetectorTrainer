@@ -7,11 +7,9 @@
 """
 
 import logging
-import random
 from pathlib import Path
 
 import chainer
-import numpy as np
 from chainer.datasets import TransformDataset
 from chainer.training import extensions
 from chainercv import transforms
@@ -47,11 +45,11 @@ class ChocoTrainer:
         log_interval=1,
         plot_interval=1,
         print_interval=1,
+        snap_shot_interval=10,
         step_size=100,
         out="result",
         n_epoch=20,
         gpu=0,
-        train_rate=0.8,
         logger=None,
     ):
         """init
@@ -64,7 +62,6 @@ class ChocoTrainer:
         if logger is None:
             logger = logging.getLogger(__name__)
         self.logger = logger
-        self.set_train_rate(train_rate)
         self.gpu = gpu
         self.dataset = None
         self.optimizer = None
@@ -74,25 +71,12 @@ class ChocoTrainer:
         self.log_interval = log_interval
         self.plot_interval = plot_interval
         self.print_interval = print_interval
+        self.snap_shot_interval = snap_shot_interval
 
     def set_output_directory(self, out):
         _ = util.check_dir(out, mkdir=True)
         self.out = out
         self.logger.info(f"set output: {out}")
-
-    def set_train_rate(self, rate):
-        """訓練データの割合を設定する
-
-        Args:
-            rate (float): 訓練データの割合
-
-        Raises:
-            ValueError: rateの定義から外れる場合に出力
-        """
-        if rate < 0.0 or rate > 1.0:
-            raise ValueError(f"rate must [0, 1]. : input_value= {rate}")
-        self.train_rate = rate
-        self.logger.info(f"set_train_rate: {self.train_rate}")
 
     def set_data(self, images, bboxs, obj_ids):
         """データセットを登録する
@@ -133,7 +117,6 @@ class ChocoTrainer:
         faster_rcnn = FasterRCNNVGG16(n_fg_class=n_class, pretrained_model="imagenet")
         faster_rcnn.use_preset("evaluate")
         model = FasterRCNNTrainChain(faster_rcnn)
-        self.faster_rcnn = faster_rcnn
         self.model = model
         self.logger.info("set FasterRCNNVGG16, pretrained=imagenet")
 
@@ -160,23 +143,10 @@ class ChocoTrainer:
         if self.dataset is None:
             raise ValueError("dataset is not initialize. ")
         N = len(self.dataset)
-        N_train = (int)(N * self.train_rate)
-        idxs = list(np.arange(N))
-        random.shuffle(idxs)
-        train_idxs = idxs[:N_train]
-        test_idxs = idxs[N_train:]
-        self.train_idxs = train_idxs
-        self.test_idxs = test_idxs
-        self.logger.info(f"the num of dataset: {N}")
-        self.logger.info(f"the num of train_data: {N_train}")
+        self.logger.info(f"the num of train-dataset: {N}")
         # iteratorのセット
-        train_data = TransformDataset(
-            self.dataset[train_idxs], Transform(self.model.faster_rcnn)
-        )
+        train_data = TransformDataset(self.dataset, Transform(self.model.faster_rcnn))
         train_iter = chainer.iterators.SerialIterator(train_data, batch_size=1)
-        # test_iter = chainer.iterators.SerialIterator(
-        #     self.dataset[test_idxs], batch_size=1, repeat=False, shuffle=False
-        # )
         self.logger.info("set iterator")
         # updater
         if self.optimizer is None:
@@ -194,8 +164,8 @@ class ChocoTrainer:
             extensions.snapshot_object(
                 self.model.faster_rcnn, "snapshot_epoch_{.updater.epoch}.npz"
             ),
-            trigger=(self.n_epoch, "epoch"),
-        )  # 学習途中のスナップショットを取らない(epochの最後だけ)
+            trigger=(self.snap_shot_interval, "epoch"),
+        )  # 学習途中のスナップショット
         trainer.extend(
             extensions.ExponentialShift("lr", 0.1),
             trigger=(self.step_size, "iteration"),
