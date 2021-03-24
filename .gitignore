@@ -5,6 +5,7 @@
 Untitled*
 tmp_*
 .coverage
+*.npz
 
 .pytest_cache/
 .ipynb_checkpoints/
