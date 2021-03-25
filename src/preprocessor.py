@@ -162,6 +162,7 @@ class ChocoPreProcessor:
         self.annotation_files = anno_files
         self.logger.info(f"annotation_file_size: {len(anno_files)}")
 
+        image_ids = []
         dataset = OrderedDict()
         for anno_file in tqdm(anno_files):
             bboxs, obj_names, meta_info = self.get_bounding_box_data(xml_file=anno_file)
@@ -181,7 +182,9 @@ class ChocoPreProcessor:
                 "obj_names": obj_names,
                 "obj_ids": obj_ids,
             }
+            image_ids.append(image_id)
         self.dataset = dataset
+        self.image_ids = image_ids
         return dataset
 
     def get_bbox_list(self):
